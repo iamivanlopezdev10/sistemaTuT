@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('categorias', function (Blueprint $table) {
             $table->id(); // Identificador único
-            $table->string('nombre'); // Nombre de la categoría
+            $table->string('nombre')->unique(); // Nombre de la categoría (debe ser único)
             $table->text('descripcion')->nullable(); // Descripción de la categoría (opcional)
             $table->timestamps(); // created_at y updated_at
         });
@@ -27,3 +27,4 @@ return new class extends Migration
         Schema::dropIfExists('categorias');
     }
 };
+

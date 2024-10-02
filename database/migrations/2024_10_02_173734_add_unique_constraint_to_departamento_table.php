@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -10,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('departamento', function (Blueprint $table) {
-            $table->id(); // Identificador único
-            $table->string('ubicacion')->unique(); // Ubicación del departamento (debe ser única)
-            $table->timestamps(); // created_at y updated_at
+        Schema::table('departamento', function (Blueprint $table) {
+            //
         });
     }
 
@@ -22,7 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('departamento');
+        Schema::table('departamento', function (Blueprint $table) {
+            //
+        });
     }
 };
-

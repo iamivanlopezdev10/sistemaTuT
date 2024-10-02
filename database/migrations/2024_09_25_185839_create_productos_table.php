@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('productos', function (Blueprint $table) {
             $table->id(); // Identificador único
-            $table->string('clave'); // Clave del producto
-            $table->string('nombre'); // Nombre del producto
+            $table->string('clave')->unique(); // Clave del producto (debe ser única)
+            $table->string('nombre')->unique(); // Nombre del producto (si también debe ser único)
             $table->text('descripcion')->nullable(); // Descripción del producto (opcional)
             $table->integer('cantidad'); // Cantidad disponible
             $table->decimal('precio', 10, 2); // Precio del producto
@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreignId('departamento_id')->constrained('departamento'); // Referencia al departamento
             $table->boolean('habilitado')->default(true); // Estado de habilitación
             $table->timestamps(); // created_at y updated_at
+
         });
     }
 
@@ -34,3 +35,4 @@ return new class extends Migration
         Schema::dropIfExists('productos');
     }
 };
+
