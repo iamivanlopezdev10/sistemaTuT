@@ -17,6 +17,17 @@
                         <form method="POST" action="{{ route('productos.store') }}" role="form" enctype="multipart/form-data">
                             @csrf
 
+                            <!-- Mostrar errores -->
+                            @if($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
                             @include('producto.form')
 
                         </form>

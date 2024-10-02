@@ -10,13 +10,8 @@ use App\Exports\ProductosExport;
 use Maatwebsite\Excel\Facades\Excel; 
 use Barryvdh\Snappy\Facades\SnappyPDF as PDF;
 use App\Exports\ProductExportPdf;
+use Illuminate\Database\QueryException;
 
-
-
-/**
- * Class ProductoController
- * @package App\Http\Controllers
- */
 class ProductoController extends Controller
 {
     /**
@@ -43,18 +38,23 @@ class ProductoController extends Controller
         // Enviar las variables a la vista
         return view('producto.create', compact('producto', 'categorias', 'departamentos'));
     }
-    
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(ProductoRequest $request)
     {   
-        
-        Producto::create($request->validated());
+        try {
+            Producto::create($request->validated());
+            return redirect()->route('productos.index')
+                ->with('success', 'Producto creado exitosamente.');
+        } catch (QueryException $e) {
+            if ($e->getCode() == 23000) { // Código de error para violación de integridad
+                return redirect()->back()->withErrors(['clave' => 'La clave ya está utilizada, por favor utilice otra.'])->withInput();
+            }
 
-        return redirect()->route('productos.index')
-            ->with('success', 'Producto creado exitosamente.');
+            return redirect()->back()->withErrors(['error' => 'Ha ocurrido un error, por favor intente nuevamente.']);
+        }
     }
 
     /**
@@ -69,44 +69,40 @@ class ProductoController extends Controller
         return view('producto.show', compact('producto', 'categorias', 'departamentos'));
     }
     
-    
     /**
      * Show the form for editing the specified resource.
      */
-
-     public function edit($id)
-     {
-         // Obtener el producto con sus relaciones
-         $producto = Producto::with(['categoria', 'departamento'])->findOrFail($id);
-         $categorias = Categoria::all();
-         $departamentos = Departamento::all();
-     
-         // Enviar las variables a la vista
-         return view('producto.edit', compact('producto', 'categorias', 'departamentos'));
-     }
-     
-
+    public function edit($id)
+    {
+        // Obtener el producto con sus relaciones
+        $producto = Producto::with(['categoria', 'departamento'])->findOrFail($id);
+        $categorias = Categoria::all();
+        $departamentos = Departamento::all();
+        
+        // Enviar las variables a la vista
+        return view('producto.edit', compact('producto', 'categorias', 'departamentos'));
+    }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(ProductoRequest $request, Producto $producto)
     {
-        // Obtener los datos validados del request
-        $data = $request->validated();
-    
-        // Verificar si el checkbox 'habilitado' está presente y asignar el valor correspondiente
-        $data['habilitado'] = $request->has('habilitado') ? 1 : 0; // 1 si está marcado, 0 si no
-    
-        // Actualizar el producto con todos los datos
-        $producto->update($data);
-    
-        // Redirigir con un mensaje de éxito
-        return redirect()->route('productos.index')
-            ->with('success', 'Producto actualizado exitosamente.');
+        try {
+            // Obtener los datos validados del request
+            $data = $request->validated();
+            $data['habilitado'] = $request->has('habilitado') ? 1 : 0; // 1 si está marcado, 0 si no
+            $producto->update($data);
+            return redirect()->route('productos.index')
+                ->with('success', 'Producto actualizado exitosamente.');
+        } catch (QueryException $e) {
+            if ($e->getCode() == 23000) { // Código de error para violación de integridad
+                return redirect()->back()->withErrors(['clave' => 'La clave ya está utilizada, por favor utilice otra.'])->withInput();
+            }
+
+            return redirect()->back()->withErrors(['error' => 'Ha ocurrido un error, por favor intente nuevamente.']);
+        }
     }
-    
-    
 
     public function destroy($id)
     {
@@ -123,6 +119,4 @@ class ProductoController extends Controller
         
         return Excel::download(new ProductosExport($productos), 'productos.xlsx');
     }
-             
-
 }
