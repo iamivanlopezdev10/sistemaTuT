@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('productos', function (Blueprint $table) {
             $table->id(); // Identificador único
             $table->string('clave')->unique(); // Clave del producto (debe ser única)
-            $table->string('nombre')->unique(); // Nombre del producto (si también debe ser único)
+            $table->string('nombre'); // Nombre del producto (si también debe ser único)
             $table->text('descripcion')->nullable(); // Descripción del producto (opcional)
             $table->integer('cantidad'); // Cantidad disponible
             $table->decimal('precio', 10, 2); // Precio del producto
